@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment — never commit; keep .env.example updated instead
+.env
+.env.*
+!.env.example
+
+# Laravel
+/backend/storage/*.key
+/backend/storage/framework/cache/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/testing/*
+/backend/storage/framework/views/*
+/backend/storage/logs/*
+/backend/storage/app/public/*
+/backend/public/storage
+/backend/public/hot
+/backend/database/*.sqlite
+/backend/database/*.sqlite-journal
+/backend/.phpunit.result.cache
+/backend/.phpunit.cache
+
+# Expo / React Native
+/frontend/.expo/
+/frontend/dist/
+/frontend/web-build/
+/frontend/expo-env.d.ts
+/frontend/ios/
+/frontend/android/
+*.jks
+*.p8
+*.p12
+*.mobileprovision
+*.orig.*
+
+# Build output
+build/
+*.tsbuildinfo
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
