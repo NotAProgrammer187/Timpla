@@ -5,6 +5,7 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { db } from '@/db/client';
 import { brews, type Brew } from '@/db/schema';
 import { isSameDay, nowIso } from '@/lib/dates';
+import { useAsyncQuery } from '@/lib/useAsyncQuery';
 import { newId } from '@/lib/uuid';
 
 import type { CreateBrewInput, ListBrewsOptions, UpdateBrewInput } from './types';
@@ -116,4 +117,16 @@ export function useBrewList(options: ListBrewsOptions = {}) {
     options.offset,
     options.withDeleted,
   ]);
+}
+
+/** Today's brews — drives the dashboard hero card (SCREENS.md §2.1). */
+export function useBrewsToday() {
+  const { updatedAt } = useLiveQuery(db.select({ count: sql<number>`count(*)` }).from(brews));
+  return useAsyncQuery(() => brewsToday(), [updatedAt?.getTime()]);
+}
+
+/** Live count of non-deleted brews, for the Profile stat strip. */
+export function useBrewCount() {
+  const { updatedAt } = useLiveQuery(db.select({ count: sql<number>`count(*)` }).from(brews));
+  return useAsyncQuery(() => countBrews(), [updatedAt?.getTime()]);
 }

@@ -1,9 +1,11 @@
 // The only place that talks to Drizzle for dashboard/stats aggregates (STRUCTURE.md rule #5).
 import { and, desc, gte, isNull, lt, sql } from 'drizzle-orm';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 
 import { db } from '@/db/client';
 import { beans, brews, type BrewMethod } from '@/db/schema';
 import { startOfMonthIso } from '@/lib/dates';
+import { useAsyncQuery } from '@/lib/useAsyncQuery';
 
 import type { FavoriteMethod, MonthlyCount, MonthlyRating, ThisWeekSummary } from './types';
 
@@ -133,4 +135,31 @@ export async function thisWeekSummary(): Promise<ThisWeekSummary> {
     avgRating: summary?.avgRating ?? null,
     streak,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Hooks — the aggregates above compose several queries, so they can't be a single
+// `useLiveQuery`. Instead a cheap live count acts as the change signal and
+// `useAsyncQuery` re-runs the aggregate whenever a brew is written.
+// ---------------------------------------------------------------------------
+
+/** Change token that ticks whenever the brews table is written to. */
+function useBrewsChangeToken(): number | undefined {
+  const { updatedAt } = useLiveQuery(db.select({ count: sql<number>`count(*)` }).from(brews));
+  return updatedAt?.getTime();
+}
+
+export function useThisWeekSummary() {
+  const token = useBrewsChangeToken();
+  return useAsyncQuery(() => thisWeekSummary(), [token]);
+}
+
+export function useFavoriteMethod() {
+  const token = useBrewsChangeToken();
+  return useAsyncQuery(() => favoriteMethod(), [token]);
+}
+
+export function useCostPerCup() {
+  const token = useBrewsChangeToken();
+  return useAsyncQuery(() => costPerCup(), [token]);
 }
