@@ -7,7 +7,7 @@
  * press-color for); every variant scales to 0.98 over 100ms. Disabled: 40% opacity,
  * never a gray swap.
  */
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -52,7 +52,10 @@ export function Button({
   testID,
 }: ButtonProps): React.JSX.Element {
   const { colors, radius, typography, spacing, hitSlop } = useTheme();
-  const scale = useRef(new Animated.Value(1)).current;
+  // Lazy `useState` initialiser rather than `useRef(new Animated.Value(1)).current`:
+  // it gives the same stable instance without constructing a throwaway Value on every
+  // render or reading a ref during render (which the React Compiler rules flag).
+  const [scale] = useState(() => new Animated.Value(1));
   const [pressed, setPressed] = useState(false);
   const isGhost = variant === 'ghost';
   const isInteractive = !disabled && !loading;

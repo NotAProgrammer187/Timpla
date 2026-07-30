@@ -23,7 +23,6 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
 
   if (error) {
     // The data layer must never block the app — log and continue.
-    // eslint-disable-next-line no-console
     console.error('[db] migration failed, continuing without a guaranteed-up-to-date schema', error);
   }
 
