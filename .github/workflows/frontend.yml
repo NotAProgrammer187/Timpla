@@ -1,0 +1,68 @@
+name: frontend
+
+on:
+  push:
+    branches: [main]
+    paths: ['frontend/**', '.github/workflows/frontend.yml']
+  pull_request:
+    paths: ['frontend/**', '.github/workflows/frontend.yml']
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+
+      # expo-router generates the typed-route declarations that tsc needs.
+      - name: Generate typed routes
+        run: npx expo customize tsconfig.json --non-interactive || true
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+  design-rules:
+    name: design rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # CLAUDE.md rule 3: no hex codes outside the token file. This is the
+      # enforcement, not the honour system.
+      - name: No hex codes outside src/theme/tokens.ts
+        run: |
+          hits=$(grep -rEn "#[0-9a-fA-F]{3,8}\b" src \
+            --include='*.ts' --include='*.tsx' \
+            | grep -v '^src/theme/tokens.ts:' || true)
+          if [ -n "$hits" ]; then
+            echo "Hex codes are only allowed in src/theme/tokens.ts:"
+            echo "$hits"
+            exit 1
+          fi
+          echo "OK - no stray hex codes."
+
+      # CLAUDE.md rule 1: the app must work with src/sync/ deleted, so nothing
+      # outside that folder may reach the network.
+      - name: Only src/sync may touch the network
+        run: |
+          hits=$(grep -rEn "\bfetch\(|XMLHttpRequest|axios" src \
+            --include='*.ts' --include='*.tsx' \
+            | grep -v '^src/sync/' || true)
+          if [ -n "$hits" ]; then
+            echo "Only src/sync/ may call the network:"
+            echo "$hits"
+            exit 1
+          fi
+          echo "OK - network access is confined to src/sync/."
