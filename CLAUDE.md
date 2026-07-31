@@ -36,8 +36,9 @@ Personal coffee brew journal. Solo dev (YENN). Monorepo.
 6. **Never add "Co-Authored-By: Claude"** or any AI attribution to commit messages or PR descriptions
 
 ## Commands
-- Frontend: `cd frontend && npx expo start`
-- Backend: `cd backend && php artisan serve` · tests: `php artisan test`
+- Frontend: `cd frontend && npm install` (first time) then `npx expo start`
+- Backend: `cd backend && composer install && composer setup` (first time) then `php artisan serve` · tests: `php artisan test`
+- `composer setup` copies `.env`, generates the app key, creates the SQLite file and migrates. Requires the `pdo_sqlite` PHP extension.
 - If setup needs more steps than this, fix the setup, don't document workarounds
 
 ## Roadmap — full build, in order

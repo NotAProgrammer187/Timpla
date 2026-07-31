@@ -1,5 +1,4 @@
-import type { BrewMethod } from '@/db/schema';
-import type { Brew, NewBrew } from '@/db/schema';
+import type { Brew, BrewMethod, NewBrew } from '@/db/schema';
 
 export type { Brew, NewBrew, BrewMethod };
 

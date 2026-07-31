@@ -2,7 +2,7 @@
  * FAB.tsx — DESIGN.md §5: "56px circle, green-800, white plus, shadow level 2."
  * Used on Home/Brews/Beans to start the New Brew flow (SCREENS.md nav).
  */
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Animated,
   Pressable,
@@ -27,7 +27,8 @@ const PRESS_DURATION_MS = 100;
 
 export function FAB({ onPress, disabled = false, style, testID }: FABProps): React.JSX.Element {
   const { colors, shadows } = useTheme();
-  const scale = useRef(new Animated.Value(1)).current;
+  // Lazy `useState` initialiser — see the note in Button.tsx.
+  const [scale] = useState(() => new Animated.Value(1));
 
   const animateTo = (toValue: number): void => {
     Animated.timing(scale, { toValue, duration: PRESS_DURATION_MS, useNativeDriver: true }).start();

@@ -26,12 +26,17 @@ jobs:
 
       - run: npm ci
 
-      # expo-router generates the typed-route declarations that tsc needs.
+      # expo-router generates the typed-route declarations that tsc needs. The
+      # command is non-interactive whenever CI is set, which Actions does for us —
+      # there is no --non-interactive flag, and passing one makes it exit 1.
       - name: Generate typed routes
-        run: npx expo customize tsconfig.json --non-interactive || true
+        run: npx expo customize tsconfig.json
 
       - name: Typecheck
         run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
 
   design-rules:
     name: design rules

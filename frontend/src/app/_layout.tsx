@@ -4,9 +4,6 @@
  * Loads Poppins (Regular + SemiBold — DESIGN.md §2's two-weight max), holds the
  * splash screen until fonts are ready, and wraps the app in
  * GestureHandlerRootView > SafeAreaProvider > ThemeProvider > DatabaseProvider > Stack.
- *
- * NOTE: `@/db/provider` is owned by the parallel data-layer agent and may not exist
- * yet — that's expected. Do not stub it here.
  */
 import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
@@ -33,6 +30,9 @@ function RootNavigation(): React.JSX.Element {
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        {/* Developer harness for the local data layer — reachable only from the
+            __DEV__-gated entries on the Dashboard and Profile tabs. */}
+        <Stack.Screen name="dev" options={{ headerShown: false }} />
       </Stack>
     </>
   );

@@ -8,6 +8,8 @@ export * from './Button';
 export * from './FAB';
 export * from './Chip';
 export * from './Input';
+export * from './SearchInput';
+export * from './Segmented';
 export * from './Card';
 export * from './RatingBadge';
 export * from './Stars';

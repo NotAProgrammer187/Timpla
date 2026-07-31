@@ -1,10 +1,11 @@
 // The only place that talks to Drizzle for recipes (STRUCTURE.md rule #5).
-import { and, desc, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 
 import { db } from '@/db/client';
 import { brews, recipes, type Recipe } from '@/db/schema';
 import { nowIso } from '@/lib/dates';
+import { useAsyncQuery } from '@/lib/useAsyncQuery';
 import { newId } from '@/lib/uuid';
 
 import type { CreateRecipeInput, UpdateRecipeInput } from './types';
@@ -99,4 +100,10 @@ export async function topRecipes(limit = 3): Promise<Recipe[]> {
 
 export function useRecipeList(options: { withDeleted?: boolean } = {}) {
   return useLiveQuery(buildRecipeListQuery(options.withDeleted), [options.withDeleted]);
+}
+
+/** Top recipes by use count — the dashboard's quick-repeat row (SCREENS.md §2.1). */
+export function useTopRecipes(limit = 3) {
+  const { updatedAt } = useLiveQuery(db.select({ count: sql<number>`count(*)` }).from(recipes));
+  return useAsyncQuery(() => topRecipes(limit), [updatedAt?.getTime(), limit]);
 }
